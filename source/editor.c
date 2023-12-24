@@ -28,11 +28,54 @@ SOFTWARE.
  *
  */
 
+/* headers */
 #include <stdio.h>
-#include <stdint.h>
-
-/* eui */
-#include "eui_sdl2.h"
-
-/* wolfie */
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
 #include "wolfie.h"
+
+/*
+ *
+ * editor state
+ *
+ */
+
+/* tilemap */
+static struct {
+	wolfie_tile_t walls[WOLFIE_MAP_HEIGHT][WOLFIE_MAP_WIDTH];
+	wolfie_tile_t things[WOLFIE_MAP_HEIGHT][WOLFIE_MAP_WIDTH];
+} tilemap;
+
+/*
+ *
+ * private functions
+ *
+ */
+
+/*
+ *
+ * public functions
+ *
+ */
+
+/* init wolfie editor */
+void wolfie_init(void)
+{
+	/* clear tilemap */
+	memset(&tilemap, 0, sizeof(tilemap));
+}
+
+/* run wolfie editor */
+/* NOTE: eui_begin() must have been called before this! */
+void wolfie_run(void)
+{
+
+}
+
+/* quit wolfie editor */
+void wolfie_quit(void)
+{
+
+}
+

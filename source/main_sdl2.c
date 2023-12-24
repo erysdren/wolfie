@@ -28,19 +28,19 @@ SOFTWARE.
  *
  */
 
+/* headers */
 #include <stdio.h>
 #include <stdint.h>
-
-/* eui */
-#include "eui_sdl2.h"
-
-/* wolfie */
 #include "wolfie.h"
-
-/* wolfenstein 3d palette */
+#include "eui_sdl2.h"
 #include "palette_wolf3d.h"
 
-/* SDL state */
+/*
+ *
+ * SDL state
+ *
+ */
+
 static SDL_Window *window;
 static SDL_Surface *surface8;
 static SDL_Surface *surface32;
@@ -50,7 +50,12 @@ static SDL_Rect blit_rect;
 static SDL_bool running;
 static SDL_Color colors[256];
 
-/* main */
+/*
+ *
+ * main
+ *
+ */
+
 int main(int argc, char **argv)
 {
 	uint32_t format;
@@ -113,6 +118,9 @@ int main(int argc, char **argv)
 	blit_rect.w = WOLFIE_WIDTH;
 	blit_rect.h = WOLFIE_HEIGHT;
 
+	/* init editor */
+	wolfie_init();
+
 	/* main loop */
 	running = SDL_TRUE;
 	while (running)
@@ -136,6 +144,9 @@ int main(int argc, char **argv)
 			/* clear */
 			eui_clear(0);
 
+			/* run editor */
+			wolfie_run();
+
 			/* eui */
 			eui_end();
 		}
@@ -147,6 +158,9 @@ int main(int argc, char **argv)
 		SDL_RenderCopy(renderer, texture, NULL, NULL);
 		SDL_RenderPresent(renderer);
 	}
+
+	/* quit editor */
+	wolfie_quit();
 
 	/* quit */
 	SDL_FreeSurface(surface8);

@@ -29,9 +29,30 @@ SOFTWARE.
 extern "C" {
 #endif
 
+/* headers */
+#include <stdint.h>
+#include "eui.h"
+
+/* tile type */
+typedef uint16_t wolfie_tile_t;
+
+/* constants */
 #define WOLFIE_WIDTH (640)
 #define WOLFIE_HEIGHT (480)
 #define WOLFIE_TITLE "wolfie"
+#define WOLFIE_MAP_WIDTH (64)
+#define WOLFIE_MAP_HEIGHT (64)
+#define WOLFIE_MAP_PITCH (WOLFIE_MAP_WIDTH * sizeof(wolfie_tile_t))
+
+/* init wolfie editor */
+void wolfie_init(void);
+
+/* run wolfie editor */
+/* NOTE: eui_begin() must have been called before this! */
+void wolfie_run(void);
+
+/* quit wolfie editor */
+void wolfie_quit(void);
 
 #ifdef __cplusplus
 }
