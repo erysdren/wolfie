@@ -1,0 +1,3 @@
+[submodule "external/eui"]
+	path = external/eui
+	url = https://github.com/erysdren/eui
