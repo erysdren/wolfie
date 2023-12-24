@@ -27,7 +27,7 @@ set(WOLFIE_COMPILE_DEFINITIONS EUI_PIXEL_DEPTH=8)
 # wolfie executable
 add_executable(wolfie
 	${PROJECT_SOURCE_DIR}/source/main_sdl2.c
-	${PROJECT_SOURCE_DIR}/source/editor.c
+	${PROJECT_SOURCE_DIR}/source/wolfie.c
 	${PROJECT_SOURCE_DIR}/external/eui/source/eui.c
 	${PROJECT_SOURCE_DIR}/external/eui/source/eui_sdl2.c)
 target_link_libraries(wolfie PUBLIC SDL2::Main)

@@ -24,7 +24,7 @@ SOFTWARE.
 
 /*
  *
- * EDITOR.C
+ * WOLFIE.C
  *
  */
 
