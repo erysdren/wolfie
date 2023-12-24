@@ -43,12 +43,18 @@ typedef uint16_t wolfie_tile_t;
 #define WOLFIE_MAP_WIDTH (64)
 #define WOLFIE_MAP_HEIGHT (64)
 #define WOLFIE_MAP_PITCH (WOLFIE_MAP_WIDTH * sizeof(wolfie_tile_t))
+#define WOLFIE_TILE_WIDTH (7)
+#define WOLFIE_TILE_HEIGHT (7)
 
 /* init wolfie editor */
 int wolfie_init(void);
 
 /* load map from uwmf buffer */
 int wolfie_load_uwmf(char *buffer, size_t buffer_size);
+
+/* save current tilemap state into uwmf format */
+/* returned as an allocated buffer that the caller is responsible for freeing */
+char *wolfie_save_uwmf(size_t *buffer_size);
 
 /* run wolfie editor */
 /* NOTE: eui_begin() must be called before this! */

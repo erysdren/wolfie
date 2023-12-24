@@ -141,9 +141,6 @@ int main(int argc, char **argv)
 		/* begin */
 		if (eui_begin_sdl2(surface8))
 		{
-			/* clear */
-			eui_clear(0);
-
 			/* run editor */
 			wolfie_run();
 
