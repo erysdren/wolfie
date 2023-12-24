@@ -60,17 +60,25 @@ static struct {
  */
 
 /* init wolfie editor */
-void wolfie_init(void)
+int wolfie_init(void)
 {
 	/* clear tilemap */
 	memset(&tilemap, 0, sizeof(tilemap));
+
+	return EUI_TRUE;
+}
+
+/* load map from uwmf buffer */
+int wolfie_load_uwmf(char *buffer, size_t buffer_size)
+{
+	return EUI_TRUE;
 }
 
 /* run wolfie editor */
-/* NOTE: eui_begin() must have been called before this! */
-void wolfie_run(void)
+/* NOTE: eui_begin() must be called before this! */
+int wolfie_run(void)
 {
-
+	return EUI_TRUE;
 }
 
 /* quit wolfie editor */

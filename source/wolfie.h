@@ -45,11 +45,14 @@ typedef uint16_t wolfie_tile_t;
 #define WOLFIE_MAP_PITCH (WOLFIE_MAP_WIDTH * sizeof(wolfie_tile_t))
 
 /* init wolfie editor */
-void wolfie_init(void);
+int wolfie_init(void);
+
+/* load map from uwmf buffer */
+int wolfie_load_uwmf(char *buffer, size_t buffer_size);
 
 /* run wolfie editor */
-/* NOTE: eui_begin() must have been called before this! */
-void wolfie_run(void);
+/* NOTE: eui_begin() must be called before this! */
+int wolfie_run(void);
 
 /* quit wolfie editor */
 void wolfie_quit(void);
