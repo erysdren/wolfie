@@ -159,8 +159,6 @@ enum {
 	TOOL_HOLLOW_RECT,
 	TOOL_FILL,
 	TOOL_PEN,
-	TOOL_REDO,
-	TOOL_UNDO,
 	NUM_TOOLS
 };
 
@@ -185,6 +183,18 @@ static int current_tool = TOOL_PEN;
  * private functions
  *
  */
+
+/* undo last change */
+void button_undo(void *user)
+{
+	EUI_UNUSED(user);
+}
+
+/* redo last change */
+void button_redo(void *user)
+{
+	EUI_UNUSED(user);
+}
 
 /*
  *
@@ -223,24 +233,12 @@ int wolfie_init(void)
 	toolinfo[TOOL_FILLED_RECT].xbm_height = filled_rect_height;
 	toolinfo[TOOL_FILLED_RECT].xbm_bits = filled_rect_bits;
 
-	toolinfo[TOOL_UNDO].xbm_width = undo_width;
-	toolinfo[TOOL_UNDO].xbm_height = undo_height;
-	toolinfo[TOOL_UNDO].xbm_bits = undo_bits;
-
-	toolinfo[TOOL_REDO].xbm_width = redo_width;
-	toolinfo[TOOL_REDO].xbm_height = redo_height;
-	toolinfo[TOOL_REDO].xbm_bits = redo_bits;
-
 	/* setup tool info positions */
 	for (i = 0; i < NUM_TOOLS; i++)
 	{
 		toolinfo[i].pos.x = -1 * ((toolinfo[i].xbm_width * i) + (4 * (i + 1)));
 		toolinfo[i].pos.y = (tilemap_pos.y / 2) - (toolinfo[i].xbm_height / 2);
 	}
-
-	/* offset UNDO and REDO buttons */
-	toolinfo[TOOL_UNDO].pos.x -= 24;
-	toolinfo[TOOL_REDO].pos.x -= 24;
 
 	return EUI_TRUE;
 }
