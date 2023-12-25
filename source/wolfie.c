@@ -134,6 +134,22 @@ static unsigned char redo_bits[] = {
 };
 
 /*
+ * tile icons
+ */
+
+#define tile_filled_width 7
+#define tile_filled_height 7
+static unsigned char tile_filled_bits[] = {
+	0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f, 0x7f
+};
+
+#define tile_dithered_width 7
+#define tile_dithered_height 7
+static unsigned char tile_dithered_bits[] = {
+	0x55, 0x2a, 0x55, 0x2a, 0x55, 0x2a, 0x55
+};
+
+/*
  *
  * editor state
  *
@@ -162,6 +178,18 @@ enum {
 	NUM_TOOLS
 };
 
+/* tiledef type */
+typedef struct tiledef_t {
+	int used;
+	char name[28];
+	struct {
+		int width;
+		int height;
+		unsigned char *bits;
+	} xbm;
+	eui_color_t color;
+} tiledef_t;
+
 /* tilemap */
 static struct {
 	wolfie_tile_t walls[WOLFIE_MAP_HEIGHT][WOLFIE_MAP_WIDTH];
@@ -170,10 +198,15 @@ static struct {
 } tilemap;
 
 /* tilemap info */
-eui_vec2_t tilemap_pos, tilemap_size;
+static eui_vec2_t tilemap_pos, tilemap_size;
 
 /* tool info */
 static toolinfo_t toolinfo[NUM_TOOLS];
+
+/* tile info */
+#define NUM_TILEDEFS (256)
+static tiledef_t tiledefs[NUM_TILEDEFS];
+static int current_tile = 0;
 
 /* current tool */
 static int current_tool = TOOL_PEN;
@@ -196,17 +229,9 @@ void button_redo(void *user)
 	EUI_UNUSED(user);
 }
 
-/*
- *
- * public functions
- *
- */
-
-/* init wolfie editor */
-int wolfie_init(void)
+/* setup tilemap */
+void setup_tilemap(void)
 {
-	int i;
-
 	/* clear tilemap */
 	memset(&tilemap, 0, sizeof(tilemap));
 
@@ -215,6 +240,43 @@ int wolfie_init(void)
 	tilemap_size.y = WOLFIE_TILE_HEIGHT * WOLFIE_MAP_HEIGHT;
 	tilemap_pos.x = WOLFIE_WIDTH - tilemap_size.x;
 	tilemap_pos.y = WOLFIE_HEIGHT - tilemap_size.y;
+}
+
+/* setup tiledefs */
+void setup_tiledefs(void)
+{
+	/* clear tilemap */
+	memset(&tiledefs, 0, sizeof(tiledefs));
+
+	/* Empty */
+	snprintf(tiledefs[0].name, sizeof(tiledefs[0].name), "Empty");
+	tiledefs[0].used = EUI_TRUE;
+	tiledefs[0].color = 0;
+	tiledefs[0].xbm.width = tile_filled_width;
+	tiledefs[0].xbm.height = tile_filled_height;
+	tiledefs[0].xbm.bits = tile_filled_bits;
+
+	/* Gray Stone 1 */
+	snprintf(tiledefs[1].name, sizeof(tiledefs[1].name), "Gray Stone 1");
+	tiledefs[1].used = EUI_TRUE;
+	tiledefs[1].color = 25;
+	tiledefs[1].xbm.width = tile_filled_width;
+	tiledefs[1].xbm.height = tile_filled_height;
+	tiledefs[1].xbm.bits = tile_filled_bits;
+
+	/* Gray Stone 2 */
+	snprintf(tiledefs[2].name, sizeof(tiledefs[2].name), "Gray Stone 2");
+	tiledefs[2].used = EUI_TRUE;
+	tiledefs[2].color = 25;
+	tiledefs[2].xbm.width = tile_dithered_width;
+	tiledefs[2].xbm.height = tile_dithered_height;
+	tiledefs[2].xbm.bits = tile_dithered_bits;
+}
+
+/* setup tools */
+void setup_tools(void)
+{
+	int i;
 
 	/* setup tool info */
 	toolinfo[TOOL_PEN].xbm_width = pen_width;
@@ -239,7 +301,20 @@ int wolfie_init(void)
 		toolinfo[i].pos.x = -1 * ((toolinfo[i].xbm_width * i) + (4 * (i + 1)));
 		toolinfo[i].pos.y = (tilemap_pos.y / 2) - (toolinfo[i].xbm_height / 2);
 	}
+}
 
+/*
+ *
+ * public functions
+ *
+ */
+
+/* init wolfie editor */
+int wolfie_init(void)
+{
+	setup_tilemap();
+	setup_tiledefs();
+	setup_tools();
 	return EUI_TRUE;
 }
 
@@ -372,6 +447,37 @@ int wolfie_run(void)
 
 		if (eui_get_button() & EUI_BUTTON_LEFT && eui_is_hovered(toolinfo[i].pos, size))
 			current_tool = i;
+	}
+
+	/* move to top left alignment */
+	eui_set_align(EUI_ALIGN_START, EUI_ALIGN_START);
+
+	/* draw tiledefs */
+	pos.x = 15;
+	pos.y = tilemap_pos.y;
+	size.x = tilemap_pos.x;
+	size.y = 10;
+	for (i = 0; i < NUM_TILEDEFS; i++)
+	{
+		if (!tiledefs[i].used)
+			continue;
+
+		/* draw tile name */
+		if (current_tile == i)
+			eui_text(pos, 72, tiledefs[i].name);
+		else
+			eui_text(pos, 15, tiledefs[i].name);
+
+		/* draw tile logo */
+		pos.x -= 11;
+		eui_xbm(pos, tiledefs[i].color, tiledefs[i].xbm.width, tiledefs[i].xbm.height, tiledefs[i].xbm.bits);
+		pos.x += 11;
+
+		/* select tile */
+		if (eui_get_button() & EUI_BUTTON_LEFT && eui_is_hovered(pos, size))
+			current_tile = i;
+
+		pos.y += 10;
 	}
 
 	return EUI_TRUE;
