@@ -37,6 +37,28 @@ SOFTWARE.
 
 /*
  *
+ * helper macros
+ *
+ */
+
+#ifndef MIN
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
+#endif
+
+#ifndef MAX
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#endif
+
+#ifndef CLAMP
+#define CLAMP(a, min, max) MIN(MAX(a, min), max)
+#endif
+
+#ifndef SGN
+#define SGN(x) ((x < 0) ? -1 : ((x > 0) ? 1 : 0))
+#endif
+
+/*
+ *
  * editor state
  *
  */
@@ -91,7 +113,9 @@ int wolfie_run(void)
 {
 	eui_vec2_t tilemap_pos, tilemap_size;
 	eui_vec2_t tile_size, tile_pos;
+	eui_vec2_t selected_tile;
 	eui_vec2_t cursor_pos;
+	eui_vec2_t pos, size;
 	int x, y;
 
 	/* get cursor pos */
@@ -125,6 +149,57 @@ int wolfie_run(void)
 			if (tilemap.things[y][x])
 				eui_filled_box(tile_pos, tile_size, 255);
 		}
+	}
+
+	/* draw selected tile */
+	if (eui_is_hovered(tilemap_pos, tilemap_size))
+	{
+		/* get tile size */
+		tile_size.x = WOLFIE_TILE_WIDTH + 2;
+		tile_size.y = WOLFIE_TILE_HEIGHT + 2;
+
+		/* get tile pos */
+		tile_pos.x = cursor_pos.x - tilemap_pos.x;
+		tile_pos.y = cursor_pos.y - tilemap_pos.y;
+
+		/* get selected tile */
+		selected_tile.x = (tile_pos.x - (tile_pos.x % WOLFIE_TILE_WIDTH)) / WOLFIE_TILE_WIDTH;
+		selected_tile.y = (tile_pos.y - (tile_pos.y % WOLFIE_TILE_HEIGHT)) / WOLFIE_TILE_HEIGHT;
+
+		/* clamp selected tile to valid range */
+		selected_tile.x = CLAMP(selected_tile.x, 0, WOLFIE_MAP_WIDTH - 1);
+		selected_tile.y = CLAMP(selected_tile.y, 0, WOLFIE_MAP_HEIGHT - 1);
+
+		/* get selected tile outline pos */
+		tile_pos.x = ((selected_tile.x * WOLFIE_TILE_WIDTH) + tilemap_pos.x) - 1;
+		tile_pos.y = ((selected_tile.y * WOLFIE_TILE_HEIGHT) + tilemap_pos.y) - 1;
+
+		/* draw tile outline */
+		eui_border_box(tile_pos, tile_size, 1, 255);
+
+		/* draw help text */
+		pos.x = tilemap_pos.x;
+		pos.y = tilemap_pos.y - 30;
+		eui_textf(pos, 15, "tile: %02dx%02d", selected_tile.x, selected_tile.y);
+		pos.x = tilemap_pos.x;
+		pos.y = tilemap_pos.y - 20;
+		eui_textf(pos, 15, "wall: 0x%04x", tilemap.walls[selected_tile.y][selected_tile.x]);
+		pos.x = tilemap_pos.x;
+		pos.y = tilemap_pos.y - 10;
+		eui_textf(pos, 15, "thing: 0x%04x", tilemap.things[selected_tile.y][selected_tile.x]);
+	}
+	else
+	{
+		/* draw help text */
+		pos.x = tilemap_pos.x;
+		pos.y = tilemap_pos.y - 30;
+		eui_text(pos, 15, "tile: --x--");
+		pos.x = tilemap_pos.x;
+		pos.y = tilemap_pos.y - 20;
+		eui_text(pos, 15, "wall: ------");
+		pos.x = tilemap_pos.x;
+		pos.y = tilemap_pos.y - 10;
+		eui_text(pos, 15, "thing: ------");
 	}
 
 	return EUI_TRUE;
