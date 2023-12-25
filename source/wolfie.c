@@ -139,8 +139,9 @@ static unsigned char redo_bits[] = {
  *
  */
 
-/* tool callback function */
-typedef void tool_func_t(int x, int y, eui_color_t color);
+/* tool callback functions */
+typedef void tool_activate_t(void);
+typedef void tool_use_t(int x, int y, eui_color_t color);
 
 /* tool info type */
 typedef struct toolinfo_t {
@@ -148,7 +149,8 @@ typedef struct toolinfo_t {
 	int xbm_width;
 	int xbm_height;
 	unsigned char *xbm_bits;
-	tool_func_t *func;
+	tool_activate_t *activate;
+	tool_use_t *use;
 } toolinfo_t;
 
 /* tool enum */
@@ -354,7 +356,7 @@ int wolfie_run(void)
 		eui_text(pos, 15, "thing: ------");
 	}
 
-	/* move to top left alignment */
+	/* move to top right alignment */
 	eui_set_align(EUI_ALIGN_END, EUI_ALIGN_START);
 
 	/* draw tools */
