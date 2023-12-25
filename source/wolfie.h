@@ -49,12 +49,13 @@ typedef uint16_t wolfie_tile_t;
 /* init wolfie editor */
 int wolfie_init(void);
 
-/* load map from uwmf buffer */
-int wolfie_load_uwmf(char *buffer, size_t buffer_size);
+/* load UWMF from char buffer */
+/* returns EUI_FALSE on failure */
+int wolfie_read_uwmf(char *buffer, size_t buffer_size);
 
-/* save current tilemap state into uwmf format */
-/* returned as an allocated buffer that the caller is responsible for freeing */
-char *wolfie_save_uwmf(size_t *buffer_size);
+/* save current editor tilemap into char buffer as UWMF */
+/* returns 0 on failure */
+size_t wolfie_write_uwmf(char *buffer, size_t buffer_size);
 
 /* run wolfie editor */
 /* NOTE: eui_begin() must be called before this! */

@@ -243,20 +243,22 @@ int wolfie_init(void)
 	return EUI_TRUE;
 }
 
-/* load map from uwmf */
-int wolfie_load_uwmf(char *buffer, size_t buffer_size)
+/* load UWMF from char buffer */
+/* returns EUI_FALSE on failure */
+int wolfie_read_uwmf(char *buffer, size_t buffer_size);
 {
 	EUI_UNUSED(buffer);
 	EUI_UNUSED(buffer_size);
-	return EUI_TRUE;
+	return EUI_FALSE;
 }
 
-/* save current tilemap state into uwmf format */
-/* returned as an allocated buffer that the caller is responsible for freeing */
-char *wolfie_save_uwmf(size_t *buffer_size)
+/* save current editor tilemap into char buffer as UWMF */
+/* returns 0 on failure */
+size_t wolfie_write_uwmf(char *buffer, size_t buffer_size);
 {
+	EUI_UNUSED(buffer);
 	EUI_UNUSED(buffer_size);
-	return NULL;
+	return 0;
 }
 
 /* run wolfie editor */
