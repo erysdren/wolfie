@@ -360,7 +360,16 @@ int wolfie_run(void)
 	/* draw tools */
 	for (i = 0; i < NUM_TOOLS; i++)
 	{
-		eui_xbm(toolinfo[i].pos, 15, toolinfo[i].xbm_width, toolinfo[i].xbm_height, toolinfo[i].xbm_bits);
+		if (current_tool == i)
+			eui_xbm(toolinfo[i].pos, 72, toolinfo[i].xbm_width, toolinfo[i].xbm_height, toolinfo[i].xbm_bits);
+		else
+			eui_xbm(toolinfo[i].pos, 15, toolinfo[i].xbm_width, toolinfo[i].xbm_height, toolinfo[i].xbm_bits);
+
+		size.x = toolinfo[i].xbm_width;
+		size.y = toolinfo[i].xbm_height;
+
+		if (eui_get_button() & EUI_BUTTON_LEFT && eui_is_hovered(toolinfo[i].pos, size))
+			current_tool = i;
 	}
 
 	return EUI_TRUE;
