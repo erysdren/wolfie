@@ -178,6 +178,13 @@ enum {
 	NUM_TOOLS
 };
 
+/* swatch enum */
+enum {
+	SWATCH_WALLS,
+	SWATCH_THINGS,
+	NUM_SWATCHES
+};
+
 /* tiledef type */
 typedef struct tiledef_t {
 	int used;
@@ -202,14 +209,15 @@ static eui_vec2_t tilemap_pos, tilemap_size;
 
 /* tool info */
 static toolinfo_t toolinfo[NUM_TOOLS];
+static int current_tool = TOOL_PEN;
 
 /* tile info */
 #define NUM_TILEDEFS (256)
 static tiledef_t tiledefs[NUM_TILEDEFS];
 static int current_tile = 0;
 
-/* current tool */
-static int current_tool = TOOL_PEN;
+/* swatch info */
+static int current_swatch = SWATCH_WALLS;
 
 /*
  *
@@ -227,6 +235,31 @@ void button_undo(void *user)
 void button_redo(void *user)
 {
 	EUI_UNUSED(user);
+}
+
+/* switch to walls swatch */
+void button_walls(void *user)
+{
+	EUI_UNUSED(user);
+	current_swatch = SWATCH_WALLS;
+}
+
+/* switch to things swatch */
+void button_things(void *user)
+{
+	EUI_UNUSED(user);
+	current_swatch = SWATCH_THINGS;
+}
+
+/* plot tile on tilemap */
+void tool_pen(int x, int y, int tile)
+{
+	/* user is not pressing any buttons */
+	if (!eui_get_button())
+		return;
+
+	/* plot tile */
+	tilemap.walls[y][x] = tile;
 }
 
 /* setup tilemap */
@@ -372,7 +405,8 @@ int wolfie_run(void)
 			tile_pos.y = tilemap_pos.y + (y * WOLFIE_TILE_HEIGHT);
 
 			/* draw wall */
-			eui_filled_box(tile_pos, tile_size, tilemap.walls[y][x]);
+			i = tilemap.walls[y][x];
+			eui_xbm(tile_pos, tiledefs[i].color, tiledefs[i].xbm.width, tiledefs[i].xbm.height, tiledefs[i].xbm.bits);
 
 			/* draw thing */
 			if (tilemap.things[y][x])
@@ -406,13 +440,24 @@ int wolfie_run(void)
 		/* draw tile outline */
 		eui_border_box(tile_pos, tile_size, 1, 255);
 
+		/* do tile interaction */
+		switch (current_tool)
+		{
+			case TOOL_PEN:
+				tool_pen(selected_tile.x, selected_tile.y, current_tile);
+				break;
+
+			default:
+				break;
+		}
+
 		/* draw help text */
 		pos.x = tilemap_pos.x;
 		pos.y = tilemap_pos.y - 30;
 		eui_textf(pos, 15, "tile: %02dx%02d", selected_tile.x, selected_tile.y);
 		pos.x = tilemap_pos.x;
 		pos.y = tilemap_pos.y - 20;
-		eui_textf(pos, 15, "wall: 0x%04x", tilemap.walls[selected_tile.y][selected_tile.x]);
+		eui_textf(pos, 15, "wall: %s", tiledefs[tilemap.walls[selected_tile.y][selected_tile.x]].name);
 		pos.x = tilemap_pos.x;
 		pos.y = tilemap_pos.y - 10;
 		eui_textf(pos, 15, "thing: 0x%04x", tilemap.things[selected_tile.y][selected_tile.x]);
@@ -452,32 +497,49 @@ int wolfie_run(void)
 	/* move to top left alignment */
 	eui_set_align(EUI_ALIGN_START, EUI_ALIGN_START);
 
-	/* draw tiledefs */
-	pos.x = 15;
+	/* draw swatch buttons */
+	pos.x = 0;
 	pos.y = tilemap_pos.y;
-	size.x = tilemap_pos.x;
-	size.y = 10;
-	for (i = 0; i < NUM_TILEDEFS; i++)
+	size.x = tilemap_pos.x / 2;
+	size.y = 16;
+	eui_button(pos, size, "Walls", button_walls, NULL);
+
+	pos.x = tilemap_pos.x - size.x;
+	eui_button(pos, size, "Things", button_things, NULL);
+
+	/* draw swatches */
+	if (current_swatch == SWATCH_WALLS)
 	{
-		if (!tiledefs[i].used)
-			continue;
+		pos.x = 15;
+		pos.y = tilemap_pos.y + 24;
+		size.x = tilemap_pos.x;
+		size.y = 10;
+		for (i = 0; i < NUM_TILEDEFS; i++)
+		{
+			if (!tiledefs[i].used)
+				continue;
 
-		/* draw tile name */
-		if (current_tile == i)
-			eui_text(pos, 72, tiledefs[i].name);
-		else
-			eui_text(pos, 15, tiledefs[i].name);
+			/* draw tile name */
+			if (current_tile == i)
+				eui_text(pos, 72, tiledefs[i].name);
+			else
+				eui_text(pos, 15, tiledefs[i].name);
 
-		/* draw tile logo */
-		pos.x -= 11;
-		eui_xbm(pos, tiledefs[i].color, tiledefs[i].xbm.width, tiledefs[i].xbm.height, tiledefs[i].xbm.bits);
-		pos.x += 11;
+			/* draw tile logo */
+			pos.x -= 11;
+			eui_xbm(pos, tiledefs[i].color, tiledefs[i].xbm.width, tiledefs[i].xbm.height, tiledefs[i].xbm.bits);
+			pos.x += 11;
 
-		/* select tile */
-		if (eui_get_button() & EUI_BUTTON_LEFT && eui_is_hovered(pos, size))
-			current_tile = i;
+			/* select tile */
+			if (eui_get_button() & EUI_BUTTON_LEFT && eui_is_hovered(pos, size))
+				current_tile = i;
 
-		pos.y += 10;
+			pos.y += 10;
+		}
+	}
+	else if (current_swatch == SWATCH_THINGS)
+	{
+
 	}
 
 	return EUI_TRUE;
