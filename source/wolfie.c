@@ -149,6 +149,13 @@ static unsigned char tile_dithered_bits[] = {
 	0x55, 0x2a, 0x55, 0x2a, 0x55, 0x2a, 0x55
 };
 
+#define tile_flag_width 7
+#define tile_flag_height 7
+static unsigned char tile_flag_bits[] = {
+	0x5d, 0x5d, 0x5d, 0x5d, 0x5d, 0x41, 0x7f
+};
+
+
 /*
  *
  * editor state
@@ -278,32 +285,75 @@ void setup_tilemap(void)
 /* setup tiledefs */
 void setup_tiledefs(void)
 {
+	FILE *file;
+	char str[64];
+
 	/* clear tilemap */
 	memset(&tiledefs, 0, sizeof(tiledefs));
 
-	/* Empty */
-	snprintf(tiledefs[0].name, sizeof(tiledefs[0].name), "Empty");
-	tiledefs[0].used = EUI_TRUE;
-	tiledefs[0].color = 0;
-	tiledefs[0].xbm.width = tile_filled_width;
-	tiledefs[0].xbm.height = tile_filled_height;
-	tiledefs[0].xbm.bits = tile_filled_bits;
+	/* read tiledefs from file (temp) */
+	file = fopen("tiledefs.cfg", "rb");
 
-	/* Gray Stone 1 */
-	snprintf(tiledefs[1].name, sizeof(tiledefs[1].name), "Gray Stone 1");
-	tiledefs[1].used = EUI_TRUE;
-	tiledefs[1].color = 25;
-	tiledefs[1].xbm.width = tile_filled_width;
-	tiledefs[1].xbm.height = tile_filled_height;
-	tiledefs[1].xbm.bits = tile_filled_bits;
+	/* no tiledefs, so just add one tile */
+	if (!file)
+	{
+		snprintf(tiledefs[0].name, sizeof(tiledefs[0].name), "Empty");
+		tiledefs[0].used = EUI_TRUE;
+		tiledefs[0].color = 0;
+		tiledefs[0].xbm.width = tile_filled_width;
+		tiledefs[0].xbm.height = tile_filled_height;
+		tiledefs[0].xbm.bits = tile_filled_bits;
+		current_tile = 0;
+		return;
+	}
 
-	/* Gray Stone 2 */
-	snprintf(tiledefs[2].name, sizeof(tiledefs[2].name), "Gray Stone 2");
-	tiledefs[2].used = EUI_TRUE;
-	tiledefs[2].color = 25;
-	tiledefs[2].xbm.width = tile_dithered_width;
-	tiledefs[2].xbm.height = tile_dithered_height;
-	tiledefs[2].xbm.bits = tile_dithered_bits;
+	/* parse tiledefs */
+	while (fgets(str, 64, file) != NULL)
+	{
+		int index, icon;
+		unsigned int color;
+		char name[28];
+
+		sscanf(str, "%d,%27[^,],%d,%x", &index, name, &icon, &color);
+
+		if (index < 0 || index >= NUM_TILEDEFS)
+			continue;
+
+		/* assign values */
+		snprintf(tiledefs[index].name, sizeof(tiledefs[index].name), name);
+		tiledefs[index].used = EUI_TRUE;
+		tiledefs[index].color = color;
+
+		/* assign icon */
+		switch (icon)
+		{
+			case 0:
+				tiledefs[index].xbm.width = tile_filled_width;
+				tiledefs[index].xbm.height = tile_filled_height;
+				tiledefs[index].xbm.bits = tile_filled_bits;
+				break;
+
+			case 1:
+				tiledefs[index].xbm.width = tile_dithered_width;
+				tiledefs[index].xbm.height = tile_dithered_height;
+				tiledefs[index].xbm.bits = tile_dithered_bits;
+				break;
+
+			case 2:
+				tiledefs[index].xbm.width = tile_flag_width;
+				tiledefs[index].xbm.height = tile_flag_height;
+				tiledefs[index].xbm.bits = tile_flag_bits;
+				break;
+
+			default:
+				tiledefs[index].xbm.width = tile_filled_width;
+				tiledefs[index].xbm.height = tile_filled_height;
+				tiledefs[index].xbm.bits = tile_filled_bits;
+				break;
+		}
+	}
+
+	fclose(file);
 }
 
 /* setup tools */

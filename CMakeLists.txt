@@ -35,3 +35,4 @@ target_compile_definitions(wolfie PUBLIC ${WOLFIE_COMPILE_DEFINITIONS})
 target_compile_options(wolfie PUBLIC ${WOLFIE_COMPILE_OPTIONS})
 target_include_directories(wolfie PUBLIC
 	${PROJECT_SOURCE_DIR}/external/eui/source)
+configure_file(${PROJECT_SOURCE_DIR}/data/tiledefs.cfg ${PROJECT_BINARY_DIR}/tiledefs.cfg COPYONLY)
