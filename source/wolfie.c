@@ -149,12 +149,29 @@ static unsigned char tile_dithered_bits[] = {
 	0x55, 0x2a, 0x55, 0x2a, 0x55, 0x2a, 0x55
 };
 
-#define tile_flag_width 7
-#define tile_flag_height 7
-static unsigned char tile_flag_bits[] = {
-	0x5d, 0x5d, 0x5d, 0x5d, 0x5d, 0x41, 0x7f
+#define tile_square_width 7
+#define tile_square_height 7
+static unsigned char tile_square_bits[] = {
+	0x7f, 0x7f, 0x63, 0x63, 0x63, 0x7f, 0x7f
 };
 
+#define tile_rect_tall_width 7
+#define tile_rect_tall_height 7
+static unsigned char tile_rect_tall_bits[] = {
+	0x7f, 0x63, 0x63, 0x63, 0x63, 0x63, 0x7f
+};
+
+#define tile_rect_wide_width 7
+#define tile_rect_wide_height 7
+static unsigned char tile_rect_wide_bits[] = {
+	0x7f, 0x7f, 0x41, 0x41, 0x41, 0x7f, 0x7f
+};
+
+#define tile_rect_bottom_width 7
+#define tile_rect_bottom_height 7
+static unsigned char tile_rect_bottom_bits[] = {
+	0x7f, 0x7f, 0x63, 0x63, 0x63, 0x63, 0x63
+};
 
 /*
  *
@@ -340,9 +357,27 @@ void setup_tiledefs(void)
 				break;
 
 			case 2:
-				tiledefs[index].xbm.width = tile_flag_width;
-				tiledefs[index].xbm.height = tile_flag_height;
-				tiledefs[index].xbm.bits = tile_flag_bits;
+				tiledefs[index].xbm.width = tile_square_width;
+				tiledefs[index].xbm.height = tile_square_height;
+				tiledefs[index].xbm.bits = tile_square_bits;
+				break;
+
+			case 3:
+				tiledefs[index].xbm.width = tile_rect_tall_width;
+				tiledefs[index].xbm.height = tile_rect_tall_height;
+				tiledefs[index].xbm.bits = tile_rect_tall_bits;
+				break;
+
+			case 4:
+				tiledefs[index].xbm.width = tile_rect_wide_width;
+				tiledefs[index].xbm.height = tile_rect_wide_height;
+				tiledefs[index].xbm.bits = tile_rect_wide_bits;
+				break;
+
+			case 5:
+				tiledefs[index].xbm.width = tile_rect_bottom_width;
+				tiledefs[index].xbm.height = tile_rect_bottom_height;
+				tiledefs[index].xbm.bits = tile_rect_bottom_bits;
 				break;
 
 			default:
