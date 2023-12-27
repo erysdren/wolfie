@@ -34,6 +34,7 @@ SOFTWARE.
 #include "wolfie.h"
 #include "eui_sdl2.h"
 #include "palette_wolf3d.h"
+#include "wolfie_icon_rgba.h"
 
 /*
  *
@@ -42,6 +43,7 @@ SOFTWARE.
  */
 
 static SDL_Window *window;
+static SDL_Surface *icon;
 static SDL_Surface *surface8;
 static SDL_Surface *surface32;
 static SDL_Renderer *renderer;
@@ -86,6 +88,10 @@ int main(int argc, char **argv)
 	SDL_RenderClear(renderer);
 	SDL_RenderPresent(renderer);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "nearest");
+
+	/* add icon */
+	icon = SDL_CreateRGBSurfaceFrom(wolfie_icon_rgba, 32, 32, 32, 128, 0xFF, 0xFF00, 0xFF0000, 0xFF000000);
+	SDL_SetWindowIcon(window, icon);
 
 	/* create our render surface */
 	surface8 = SDL_CreateRGBSurface(0, WOLFIE_WIDTH, WOLFIE_HEIGHT, 8, 0, 0, 0, 0);
@@ -149,6 +155,12 @@ int main(int argc, char **argv)
 
 		/* blit to screen */
 		SDL_BlitSurface(surface8, &blit_rect, surface32, &blit_rect);
+		SDL_Rect temp;
+		temp.x = 0;
+		temp.y = 0;
+		temp.w = 32;
+		temp.h = 32;
+		SDL_BlitSurface(icon, &temp, surface32, &temp);
 		SDL_UpdateTexture(texture, NULL, surface32->pixels, surface32->pitch);
 		SDL_RenderClear(renderer);
 		SDL_RenderCopy(renderer, texture, NULL, NULL);
@@ -159,6 +171,7 @@ int main(int argc, char **argv)
 	wolfie_quit();
 
 	/* quit */
+	SDL_FreeSurface(icon);
 	SDL_FreeSurface(surface8);
 	SDL_FreeSurface(surface32);
 	SDL_DestroyTexture(texture);

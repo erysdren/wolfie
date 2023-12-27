@@ -1,5 +1,5 @@
 
-# Wolfie
+![WOLFIE](./.github/logo_wide_large.png "WOLFIE")
 
 Wolfenstein Interactive Editor
 
