@@ -155,12 +155,6 @@ int main(int argc, char **argv)
 
 		/* blit to screen */
 		SDL_BlitSurface(surface8, &blit_rect, surface32, &blit_rect);
-		SDL_Rect temp;
-		temp.x = 0;
-		temp.y = 0;
-		temp.w = 32;
-		temp.h = 32;
-		SDL_BlitSurface(icon, &temp, surface32, &temp);
 		SDL_UpdateTexture(texture, NULL, surface32->pixels, surface32->pitch);
 		SDL_RenderClear(renderer);
 		SDL_RenderCopy(renderer, texture, NULL, NULL);
