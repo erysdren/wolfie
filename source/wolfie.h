@@ -34,16 +34,14 @@ extern "C" {
 #include "eui_evnt.h"
 #include "eui_widg.h"
 
-/* tile type */
-typedef unsigned short wolfie_tile_t;
-
 /* constants */
 #define WOLFIE_WIDTH (640)
 #define WOLFIE_HEIGHT (480)
 #define WOLFIE_TITLE "wolfie"
+#define WOLFIE_NUM_LAYERS (2)
 #define WOLFIE_MAP_WIDTH (64)
 #define WOLFIE_MAP_HEIGHT (64)
-#define WOLFIE_MAP_PITCH (WOLFIE_MAP_WIDTH * sizeof(wolfie_tile_t))
+#define WOLFIE_MAP_PITCH (WOLFIE_MAP_WIDTH * sizeof(unsigned char))
 #define WOLFIE_TILE_WIDTH (7)
 #define WOLFIE_TILE_HEIGHT (7)
 
