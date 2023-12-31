@@ -9,7 +9,7 @@ project(wolfie
 )
 set(CMAKE_C_STANDARD 90)
 set(CMAKE_C_STANDARD_REQUIRED TRUE)
-list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/external/sdl2-cmake-modules")
 
 # sdl2
 find_package(SDL2 REQUIRED)
@@ -29,7 +29,7 @@ endif()
 # compile definitions
 set(WOLFIE_COMPILE_DEFINITIONS)
 
-# wolfie executable
+# executable
 add_executable(wolfie
 	${PROJECT_SOURCE_DIR}/source/main.c
 	${PROJECT_SOURCE_DIR}/source/wolfie.c)
