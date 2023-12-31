@@ -24,45 +24,54 @@ SOFTWARE.
 
 /*
  *
- * MAIN_SDL2.C
+ * MAIN.C
  *
  */
 
-/* headers */
 #include <stdio.h>
+#include <stdbool.h>
 #include <stdint.h>
+
 #include "wolfie.h"
 #include "eui_sdl2.h"
 #include "palette_wolf3d.h"
 #include "wolfie_icon_rgba.h"
 
-/*
- *
- * SDL state
- *
- */
-
+/* SDL2 state */
 static SDL_Window *window;
 static SDL_Surface *icon;
 static SDL_Surface *surface8;
 static SDL_Surface *surface32;
 static SDL_Renderer *renderer;
 static SDL_Texture *texture;
-static SDL_Rect blit_rect;
+static SDL_Rect rect;
 static SDL_Color colors[256];
+static SDL_Event event;
 
-/*
- *
- * main
- *
- */
+/* quit */
+void quit(int code)
+{
+	wolfie_quit();
+	eui_quit();
 
+	if (icon) SDL_FreeSurface(icon);
+	if (surface8) SDL_FreeSurface(surface8);
+	if (surface32) SDL_FreeSurface(surface32);
+	if (texture) SDL_DestroyTexture(texture);
+	if (renderer) SDL_DestroyRenderer(renderer);
+	if (window) SDL_DestroyWindow(window);
+
+	SDL_Quit();
+
+	exit(code);
+}
+
+/* main */
 int main(int argc, char **argv)
 {
 	uint32_t format;
 	unsigned int rmask, gmask, bmask, amask;
 	int bpp;
-	SDL_Event event;
 	int i;
 
 	EUI_UNUSED(argc);
@@ -96,7 +105,7 @@ int main(int argc, char **argv)
 	surface8 = SDL_CreateRGBSurface(0, WOLFIE_WIDTH, WOLFIE_HEIGHT, 8, 0, 0, 0, 0);
 	SDL_FillRect(surface8, NULL, 0);
 
-	/* generate palette */
+	/* init palette */
 	for (i = 0; i < 256; i++)
 	{
 		colors[i].r = palette[i * 3];
@@ -117,10 +126,13 @@ int main(int argc, char **argv)
 	SDL_SetRelativeMouseMode(SDL_FALSE);
 
 	/* setup blit rect */
-	blit_rect.x = 0;
-	blit_rect.y = 0;
-	blit_rect.w = WOLFIE_WIDTH;
-	blit_rect.h = WOLFIE_HEIGHT;
+	rect.x = 0;
+	rect.y = 0;
+	rect.w = WOLFIE_WIDTH;
+	rect.h = WOLFIE_HEIGHT;
+
+	/* init eui */
+	eui_init(surface8->w, surface8->h, surface8->format->BitsPerPixel, surface8->pitch, surface8->pixels);
 
 	/* init editor */
 	wolfie_init();
@@ -128,39 +140,25 @@ int main(int argc, char **argv)
 	/* main loop */
 	while (!SDL_QuitRequested())
 	{
-		/* parse sdl events */
+		/* push events */
 		while (SDL_PollEvent(&event))
-			eui_push_event_sdl2(&event);
+			eui_sdl2_event_push(&event);
 
-		/* begin */
-		if (eui_begin_sdl2(surface8))
-		{
-			/* run editor */
-			wolfie_run();
+		/* process events */
+		eui_event_queue_process();
 
-			/* eui */
-			eui_end();
-		}
+		/* run editor */
+		wolfie_main();
 
-		/* blit to screen */
-		SDL_BlitSurface(surface8, &blit_rect, surface32, &blit_rect);
+		/* copy to screen */
+		SDL_BlitSurface(surface8, &rect, surface32, &rect);
 		SDL_UpdateTexture(texture, NULL, surface32->pixels, surface32->pitch);
 		SDL_RenderClear(renderer);
 		SDL_RenderCopy(renderer, texture, NULL, NULL);
 		SDL_RenderPresent(renderer);
 	}
 
-	/* quit editor */
-	wolfie_quit();
-
 	/* quit */
-	SDL_FreeSurface(icon);
-	SDL_FreeSurface(surface8);
-	SDL_FreeSurface(surface32);
-	SDL_DestroyTexture(texture);
-	SDL_DestroyRenderer(renderer);
-	SDL_DestroyWindow(window);
-	SDL_Quit();
-
+	quit(0);
 	return 0;
 }

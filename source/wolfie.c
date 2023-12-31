@@ -22,41 +22,71 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#pragma once
-#ifndef _WOLFIE_H_
-#define _WOLFIE_H_
-#ifdef __cplusplus
-extern "C" {
+/*
+ *
+ * WOLFIE.C
+ *
+ */
+
+#include <stdio.h>
+#include <stddef.h>
+#include <stdlib.h>
+#include <string.h>
+#include "wolfie.h"
+
+/*
+ *
+ * macros
+ *
+ */
+
+#ifndef MIN
+#define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #endif
 
-/* headers */
-#include "eui.h"
-#include "eui_evnt.h"
-#include "eui_widg.h"
+#ifndef MAX
+#define MAX(a, b) (((a) > (b)) ? (a) : (b))
+#endif
 
-/* tile type */
-typedef unsigned short wolfie_tile_t;
+#ifndef CLAMP
+#define CLAMP(a, min, max) MIN(MAX(a, min), max)
+#endif
 
-/* constants */
-#define WOLFIE_WIDTH (640)
-#define WOLFIE_HEIGHT (480)
-#define WOLFIE_TITLE "wolfie"
-#define WOLFIE_MAP_WIDTH (64)
-#define WOLFIE_MAP_HEIGHT (64)
-#define WOLFIE_MAP_PITCH (WOLFIE_MAP_WIDTH * sizeof(wolfie_tile_t))
-#define WOLFIE_TILE_WIDTH (7)
-#define WOLFIE_TILE_HEIGHT (7)
+#ifndef SGN
+#define SGN(x) ((x < 0) ? -1 : ((x > 0) ? 1 : 0))
+#endif
+
+/*
+ *
+ * state
+ *
+ */
+
+
+
+/*
+ *
+ * public functions
+ *
+ */
 
 /* init editor */
-int wolfie_init(void);
+int wolfie_init(void)
+{
+	return EUI_TRUE;
+}
 
 /* run editor */
-int wolfie_main(void);
+int wolfie_main(void)
+{
+	/* clear screen */
+	eui_screen_clear(0x1E);
+
+	return EUI_TRUE;
+}
 
 /* quit editor */
-void wolfie_quit(void);
+void wolfie_quit(void)
+{
 
-#ifdef __cplusplus
 }
-#endif
-#endif /* _WOLFIE_H_ */

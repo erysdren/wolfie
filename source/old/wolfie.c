@@ -181,11 +181,11 @@ static unsigned char tile_rect_bottom_bits[] = {
 
 /* tool callback functions */
 typedef void tool_activate_t(void);
-typedef void tool_use_t(int x, int y, eui_color_t color);
+typedef void tool_use_t(int x, int y, unsigned int color);
 
 /* tool info type */
 typedef struct toolinfo_t {
-	eui_vec2_t pos;
+	int x, y;
 	int xbm_width;
 	int xbm_height;
 	unsigned char *xbm_bits;
@@ -436,24 +436,6 @@ int wolfie_init(void)
 	return EUI_TRUE;
 }
 
-/* load UWMF from char buffer */
-/* returns EUI_FALSE on failure */
-int wolfie_read_uwmf(char *buffer, size_t buffer_size)
-{
-	EUI_UNUSED(buffer);
-	EUI_UNUSED(buffer_size);
-	return EUI_FALSE;
-}
-
-/* save current editor tilemap into char buffer as UWMF */
-/* returns 0 on failure */
-size_t wolfie_write_uwmf(char *buffer, size_t buffer_size)
-{
-	EUI_UNUSED(buffer);
-	EUI_UNUSED(buffer_size);
-	return 0;
-}
-
 /* run wolfie editor */
 /* NOTE: eui_begin() must be called before this! */
 int wolfie_run(void)
@@ -635,4 +617,3 @@ void wolfie_quit(void)
 {
 
 }
-

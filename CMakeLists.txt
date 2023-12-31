@@ -11,8 +11,9 @@ set(CMAKE_C_STANDARD 90)
 set(CMAKE_C_STANDARD_REQUIRED TRUE)
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
-# sdl2
+# requirements
 find_package(SDL2 REQUIRED)
+add_subdirectory(${PROJECT_SOURCE_DIR}/external/eui)
 
 # compile options
 if(CMAKE_C_COMPILER_ID STREQUAL "GNU")
@@ -22,17 +23,14 @@ else()
 endif()
 
 # compile definitions
-set(WOLFIE_COMPILE_DEFINITIONS EUI_PIXEL_DEPTH=8)
+set(WOLFIE_COMPILE_DEFINITIONS)
 
 # wolfie executable
 add_executable(wolfie
-	${PROJECT_SOURCE_DIR}/source/main_sdl2.c
-	${PROJECT_SOURCE_DIR}/source/wolfie.c
-	${PROJECT_SOURCE_DIR}/external/eui/source/eui.c
-	${PROJECT_SOURCE_DIR}/external/eui/source/eui_sdl2.c)
-target_link_libraries(wolfie PUBLIC SDL2::Main)
+	${PROJECT_SOURCE_DIR}/external/eui/source/eui/eui_sdl2.c
+	${PROJECT_SOURCE_DIR}/source/main.c
+	${PROJECT_SOURCE_DIR}/source/wolfie.c)
+target_link_libraries(wolfie PUBLIC SDL2::Main eui)
 target_compile_definitions(wolfie PUBLIC ${WOLFIE_COMPILE_DEFINITIONS})
 target_compile_options(wolfie PUBLIC ${WOLFIE_COMPILE_OPTIONS})
-target_include_directories(wolfie PUBLIC
-	${PROJECT_SOURCE_DIR}/external/eui/source)
 configure_file(${PROJECT_SOURCE_DIR}/data/tiledefs.cfg ${PROJECT_BINARY_DIR}/tiledefs.cfg COPYONLY)
