@@ -51,7 +51,7 @@ typedef unsigned short wolfie_tile_t;
 int wolfie_init(void);
 
 /* run editor */
-int wolfie_main(void);
+void wolfie_main(void);
 
 /* quit editor */
 void wolfie_quit(void);

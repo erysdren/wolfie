@@ -77,12 +77,17 @@ int wolfie_init(void)
 }
 
 /* run editor */
-int wolfie_main(void)
+void wolfie_main(void)
 {
-	/* clear screen */
-	eui_screen_clear(0x1E);
+	/* begin eui context */
+	if (eui_context_begin())
+	{
+		/* clear screen */
+		eui_screen_clear(0x1E);
 
-	return EUI_TRUE;
+		/* end eui context */
+		eui_context_end();
+	}
 }
 
 /* quit editor */

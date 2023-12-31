@@ -11,8 +11,12 @@ set(CMAKE_C_STANDARD 90)
 set(CMAKE_C_STANDARD_REQUIRED TRUE)
 list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
-# requirements
+# sdl2
 find_package(SDL2 REQUIRED)
+
+# eui
+option(EUI_BUILD_EXAMPLES "Build Example Applications" OFF)
+option(EUI_INSTALL_TARGET "Enable Install Target" OFF)
 add_subdirectory(${PROJECT_SOURCE_DIR}/external/eui)
 
 # compile options
@@ -27,10 +31,9 @@ set(WOLFIE_COMPILE_DEFINITIONS)
 
 # wolfie executable
 add_executable(wolfie
-	${PROJECT_SOURCE_DIR}/external/eui/source/eui/eui_sdl2.c
 	${PROJECT_SOURCE_DIR}/source/main.c
 	${PROJECT_SOURCE_DIR}/source/wolfie.c)
-target_link_libraries(wolfie PUBLIC SDL2::Main eui)
+target_link_libraries(wolfie PUBLIC SDL2::Main eui_sdl2)
 target_compile_definitions(wolfie PUBLIC ${WOLFIE_COMPILE_DEFINITIONS})
 target_compile_options(wolfie PUBLIC ${WOLFIE_COMPILE_OPTIONS})
 configure_file(${PROJECT_SOURCE_DIR}/data/tiledefs.cfg ${PROJECT_BINARY_DIR}/tiledefs.cfg COPYONLY)
