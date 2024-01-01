@@ -151,6 +151,18 @@ static void draw_tilemap(void)
 	}
 }
 
+static void draw_text(void)
+{
+	if (eui_cursor_hovering(tilemap_x, tilemap_y, tilemap_w, tilemap_h))
+	{
+		eui_draw_textf(tilemap_x, tilemap_y - 10, 0x0F, "tile: %02dx%02d", selected_tile_x, selected_tile_y);
+	}
+	else
+	{
+		eui_draw_text(tilemap_x, tilemap_y - 10, 0x0F, "tile: --x--");
+	}
+}
+
 /*
  *
  * public functions
@@ -174,6 +186,7 @@ void wolfie_main(void)
 		eui_frame_align_set(EUI_ALIGN_START, EUI_ALIGN_START);
 		draw_background();
 		draw_tilemap();
+		draw_text();
 		eui_context_end();
 	}
 }
