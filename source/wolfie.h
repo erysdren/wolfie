@@ -37,7 +37,7 @@ extern "C" {
 /* constants */
 #define WOLFIE_WIDTH (640)
 #define WOLFIE_HEIGHT (480)
-#define WOLFIE_TITLE "wolfie"
+#define WOLFIE_TITLE "WOLFIE"
 #define WOLFIE_NUM_LAYERS (2)
 #define WOLFIE_MAP_WIDTH (64)
 #define WOLFIE_MAP_HEIGHT (64)

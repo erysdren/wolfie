@@ -63,11 +63,16 @@ SOFTWARE.
  */
 
 /* tilemap */
-static int tilemap_x = WOLFIE_WIDTH - (WOLFIE_TILE_WIDTH * WOLFIE_MAP_WIDTH);
-static int tilemap_y = WOLFIE_HEIGHT - (WOLFIE_TILE_HEIGHT * WOLFIE_MAP_HEIGHT);
-static int tilemap_w = WOLFIE_TILE_WIDTH * WOLFIE_MAP_WIDTH;
-static int tilemap_h = WOLFIE_TILE_HEIGHT * WOLFIE_MAP_HEIGHT;
+static const int tilemap_x = WOLFIE_WIDTH - (WOLFIE_TILE_WIDTH * WOLFIE_MAP_WIDTH);
+static const int tilemap_y = WOLFIE_HEIGHT - (WOLFIE_TILE_HEIGHT * WOLFIE_MAP_HEIGHT);
+static const int tilemap_w = WOLFIE_TILE_WIDTH * WOLFIE_MAP_WIDTH;
+static const int tilemap_h = WOLFIE_TILE_HEIGHT * WOLFIE_MAP_HEIGHT;
 static unsigned char tilemap[WOLFIE_NUM_LAYERS][WOLFIE_MAP_HEIGHT][WOLFIE_MAP_WIDTH];
+
+/* tilemap canvas */
+#define CANVAS_WIDTH (WOLFIE_TILE_WIDTH * WOLFIE_MAP_WIDTH)
+#define CANVAS_HEIGHT (WOLFIE_TILE_HEIGHT * WOLFIE_MAP_HEIGHT)
+static unsigned char tilemap_canvas[CANVAS_HEIGHT][CANVAS_WIDTH];
 
 /* current selections */
 static int active_layer = 0;
@@ -91,14 +96,12 @@ static void draw_tilemap(void)
 {
 	int l, x, y, xx, yy, w, h, c;
 	int cursor_x, cursor_y;
-
-	/* background */
-	eui_draw_box(tilemap_x, tilemap_y, tilemap_w, tilemap_h, 0x00);
+	int tile_x, tile_y, tile_w, tile_h;
 
 	/* read cursor position */
 	eui_cursor_read(&cursor_x, &cursor_y);
 
-	/* tiles */
+	/* render tiles to canvas */
 	for (l = 0; l < WOLFIE_NUM_LAYERS; l++)
 	{
 		for (y = 0; y < WOLFIE_MAP_HEIGHT; y++)
@@ -106,22 +109,25 @@ static void draw_tilemap(void)
 			for (x = 0; x < WOLFIE_MAP_WIDTH; x++)
 			{
 				/* get size */
-				w = WOLFIE_TILE_WIDTH;
-				h = WOLFIE_TILE_HEIGHT;
+				tile_w = WOLFIE_TILE_WIDTH;
+				tile_h = WOLFIE_TILE_HEIGHT;
 
 				/* get pos */
-				xx = tilemap_x + (x * w);
-				yy = tilemap_y + (y * h);
+				tile_x = x * tile_w;
+				tile_y = y * tile_h;
 
 				/* get color */
 				c = tilemap[l][y][x];
 
 				/* draw box */
-				if (c)
-					eui_draw_box(xx, yy, w, h, c);
+				for (yy = tile_y; yy < tile_y + tile_h; yy++)
+					memset(&tilemap_canvas[yy][tile_x], c, tile_w);
 			}
 		}
 	}
+
+	/* draw tilemap canvas */
+	eui_draw_bitmap(tilemap_x, tilemap_y, tilemap_w, tilemap_h, 8, tilemap_w, tilemap_canvas);
 
 	/* selected tile */
 	if (eui_cursor_hovering(tilemap_x, tilemap_y, tilemap_w, tilemap_h))
