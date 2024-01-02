@@ -58,6 +58,26 @@ SOFTWARE.
 
 /*
  *
+ * types
+ *
+ */
+
+typedef struct tile_t {
+	signed char tile;
+	signed char sector;
+	signed char zone;
+	signed char tag;
+} tile_t;
+
+typedef struct tiledef_t {
+	char texture_north[32];
+	char texture_south[32];
+	char texture_east[32];
+	char texture_wast[32];
+} tiledef_t;
+
+/*
+ *
  * state
  *
  */
@@ -67,7 +87,7 @@ static const int tilemap_x = WOLFIE_WIDTH - (WOLFIE_TILE_WIDTH * WOLFIE_MAP_WIDT
 static const int tilemap_y = WOLFIE_HEIGHT - (WOLFIE_TILE_HEIGHT * WOLFIE_MAP_HEIGHT);
 static const int tilemap_w = WOLFIE_TILE_WIDTH * WOLFIE_MAP_WIDTH;
 static const int tilemap_h = WOLFIE_TILE_HEIGHT * WOLFIE_MAP_HEIGHT;
-static unsigned char tilemap[WOLFIE_NUM_LAYERS][WOLFIE_MAP_HEIGHT][WOLFIE_MAP_WIDTH];
+static tile_t tilemap[WOLFIE_MAP_HEIGHT][WOLFIE_MAP_WIDTH];
 
 /* tilemap canvas */
 #define CANVAS_WIDTH (WOLFIE_TILE_WIDTH * WOLFIE_MAP_WIDTH)
@@ -91,31 +111,28 @@ static void draw_background(void)
 
 static void draw_tilemap(void)
 {
-	int l, x, y, yy, c;
+	int x, y, yy, c;
 	int tile_x, tile_y, tile_w, tile_h;
 
 	/* render tiles to canvas */
-	for (l = 0; l < WOLFIE_NUM_LAYERS; l++)
+	for (y = 0; y < WOLFIE_MAP_HEIGHT; y++)
 	{
-		for (y = 0; y < WOLFIE_MAP_HEIGHT; y++)
+		for (x = 0; x < WOLFIE_MAP_WIDTH; x++)
 		{
-			for (x = 0; x < WOLFIE_MAP_WIDTH; x++)
-			{
-				/* get size */
-				tile_w = WOLFIE_TILE_WIDTH;
-				tile_h = WOLFIE_TILE_HEIGHT;
+			/* get size */
+			tile_w = WOLFIE_TILE_WIDTH;
+			tile_h = WOLFIE_TILE_HEIGHT;
 
-				/* get pos */
-				tile_x = x * tile_w;
-				tile_y = y * tile_h;
+			/* get pos */
+			tile_x = x * tile_w;
+			tile_y = y * tile_h;
 
-				/* get color */
-				c = tilemap[l][y][x];
+			/* get color */
+			c = tilemap[y][x].tile;
 
-				/* draw box */
-				for (yy = tile_y; yy < tile_y + tile_h; yy++)
-					memset(&tilemap_canvas[yy][tile_x], c, tile_w);
-			}
+			/* draw box */
+			for (yy = tile_y; yy < tile_y + tile_h; yy++)
+				memset(&tilemap_canvas[yy][tile_x], c, tile_w);
 		}
 	}
 
