@@ -75,9 +75,6 @@ static unsigned char tilemap[WOLFIE_NUM_LAYERS][WOLFIE_MAP_HEIGHT][WOLFIE_MAP_WI
 static unsigned char tilemap_canvas[CANVAS_HEIGHT][CANVAS_WIDTH];
 
 /* current selections */
-static int active_layer = 0;
-static int active_tool = 0;
-static unsigned char active_tile = 0;
 static int selected_tile_x = 0;
 static int selected_tile_y = 0;
 
@@ -94,12 +91,8 @@ static void draw_background(void)
 
 static void draw_tilemap(void)
 {
-	int l, x, y, xx, yy, w, h, c;
-	int cursor_x, cursor_y;
+	int l, x, y, yy, c;
 	int tile_x, tile_y, tile_w, tile_h;
-
-	/* read cursor position */
-	eui_cursor_read(&cursor_x, &cursor_y);
 
 	/* render tiles to canvas */
 	for (l = 0; l < WOLFIE_NUM_LAYERS; l++)
@@ -128,6 +121,15 @@ static void draw_tilemap(void)
 
 	/* draw tilemap canvas */
 	eui_draw_bitmap(tilemap_x, tilemap_y, tilemap_w, tilemap_h, 8, tilemap_w, tilemap_canvas);
+}
+
+static void draw_selected_tile(void)
+{
+	int x, y, w, h;
+	int cursor_x, cursor_y;
+
+	/* read cursor position */
+	eui_cursor_read(&cursor_x, &cursor_y);
 
 	/* selected tile */
 	if (eui_cursor_hovering(tilemap_x, tilemap_y, tilemap_w, tilemap_h))
@@ -137,23 +139,23 @@ static void draw_tilemap(void)
 		h = WOLFIE_TILE_HEIGHT + 2;
 
 		/* get tile pos */
-		xx = cursor_x - tilemap_x;
-		yy = cursor_y - tilemap_y;
+		x = cursor_x - tilemap_x;
+		y = cursor_y - tilemap_y;
 
 		/* get selected tile */
-		selected_tile_x = (xx - (xx % WOLFIE_TILE_WIDTH)) / WOLFIE_TILE_WIDTH;
-		selected_tile_y = (yy - (yy % WOLFIE_TILE_HEIGHT)) / WOLFIE_TILE_HEIGHT;
+		selected_tile_x = (x - (x % WOLFIE_TILE_WIDTH)) / WOLFIE_TILE_WIDTH;
+		selected_tile_y = (y - (y % WOLFIE_TILE_HEIGHT)) / WOLFIE_TILE_HEIGHT;
 
 		/* clamp selected tile to valid range */
 		selected_tile_x = CLAMP(selected_tile_x, 0, WOLFIE_MAP_WIDTH - 1);
 		selected_tile_y = CLAMP(selected_tile_y, 0, WOLFIE_MAP_HEIGHT - 1);
 
 		/* get selected tile outline pos */
-		xx = ((selected_tile_x * WOLFIE_TILE_WIDTH) + tilemap_x) - 1;
-		yy = ((selected_tile_y * WOLFIE_TILE_HEIGHT) + tilemap_y) - 1;
+		x = ((selected_tile_x * WOLFIE_TILE_WIDTH) + tilemap_x) - 1;
+		y = ((selected_tile_y * WOLFIE_TILE_HEIGHT) + tilemap_y) - 1;
 
 		/* draw tile outline */
-		eui_draw_box_border(xx, yy, w, h, 1, 0xFF);
+		eui_draw_box_border(x, y, w, h, 1, 0xFF);
 	}
 }
 
@@ -192,6 +194,7 @@ void wolfie_main(void)
 		eui_frame_align_set(EUI_ALIGN_START, EUI_ALIGN_START);
 		draw_background();
 		draw_tilemap();
+		draw_selected_tile();
 		draw_text();
 		eui_context_end();
 	}
