@@ -33,6 +33,7 @@ SOFTWARE.
 #include <stdlib.h>
 #include <string.h>
 #include "wolfie.h"
+#include "wad.h"
 
 /*
  *
@@ -58,41 +59,29 @@ SOFTWARE.
 
 /*
  *
- * types
- *
- */
-
-typedef struct tile_t {
-	signed char tile;
-	signed char sector;
-	signed char zone;
-	signed char tag;
-} tile_t;
-
-typedef struct tiledef_t {
-	char texture_north[32];
-	char texture_south[32];
-	char texture_east[32];
-	char texture_wast[32];
-} tiledef_t;
-
-/*
- *
  * state
  *
  */
+
+/* map info */
+char map_name[32];
+char map_namespace[32];
 
 /* tilemap */
 static const int tilemap_x = WOLFIE_WIDTH - (WOLFIE_TILE_WIDTH * WOLFIE_MAP_WIDTH);
 static const int tilemap_y = WOLFIE_HEIGHT - (WOLFIE_TILE_HEIGHT * WOLFIE_MAP_HEIGHT);
 static const int tilemap_w = WOLFIE_TILE_WIDTH * WOLFIE_MAP_WIDTH;
 static const int tilemap_h = WOLFIE_TILE_HEIGHT * WOLFIE_MAP_HEIGHT;
-static tile_t tilemap[WOLFIE_MAP_HEIGHT][WOLFIE_MAP_WIDTH];
+tile_t tilemap[WOLFIE_MAP_HEIGHT][WOLFIE_MAP_WIDTH];
 
 /* tilemap canvas */
 #define CANVAS_WIDTH (WOLFIE_TILE_WIDTH * WOLFIE_MAP_WIDTH)
 #define CANVAS_HEIGHT (WOLFIE_TILE_HEIGHT * WOLFIE_MAP_HEIGHT)
 static unsigned char tilemap_canvas[CANVAS_HEIGHT][CANVAS_WIDTH];
+
+/* tiledefs */
+int num_tiledefs;
+tiledef_t tiledefs[SCHAR_MAX];
 
 /* current selections */
 static int selected_tile_x = 0;
@@ -178,6 +167,8 @@ static void draw_selected_tile(void)
 
 static void draw_text(void)
 {
+	eui_font_set(EUI_FONT_8X8);
+
 	if (eui_cursor_hovering(tilemap_x, tilemap_y, tilemap_w, tilemap_h))
 	{
 		eui_draw_textf(tilemap_x, tilemap_y - 10, 0x0F, "tile: %02dx%02d", selected_tile_x, selected_tile_y);
@@ -186,6 +177,27 @@ static void draw_text(void)
 	{
 		eui_draw_text(tilemap_x, tilemap_y - 10, 0x0F, "tile: --x--");
 	}
+}
+
+static void button_load(void *user)
+{
+	EUI_UNUSED(user);
+	wad_load_textmap();
+}
+
+static void button_save(void *user)
+{
+	EUI_UNUSED(user);
+	wad_save_textmap();
+}
+
+static void draw_buttons(void)
+{
+	eui_frame_align_set(EUI_ALIGN_START, EUI_ALIGN_END);
+	eui_font_set(EUI_FONT_8X14);
+
+	eui_widget_button(0, 0, tilemap_x, 24, "Save", button_save, NULL);
+	eui_widget_button(0, -24, tilemap_x, 24, "Load", button_load, NULL);
 }
 
 /*
@@ -199,6 +211,8 @@ int wolfie_init(void)
 {
 	memset(tilemap, 0, sizeof(tilemap));
 
+	snprintf(map_namespace, sizeof(map_namespace), "Wolf3D");
+
 	return EUI_TRUE;
 }
 
@@ -209,10 +223,13 @@ void wolfie_main(void)
 	if (eui_context_begin())
 	{
 		eui_frame_align_set(EUI_ALIGN_START, EUI_ALIGN_START);
+
 		draw_background();
 		draw_tilemap();
 		draw_selected_tile();
 		draw_text();
+		draw_buttons();
+
 		eui_context_end();
 	}
 }

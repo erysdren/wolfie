@@ -4,3 +4,6 @@
 [submodule "external/eui"]
 	path = external/eui
 	url = https://github.com/erysdren/eui
+[submodule "external/tinyfiledialogs"]
+	path = external/tinyfiledialogs
+	url = https://git.code.sf.net/p/tinyfiledialogs/code
